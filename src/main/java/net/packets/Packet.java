@@ -1,4 +1,4 @@
-package packets;
+package net.packets;
 
 import net.GameClient;
 import net.GameServer;
