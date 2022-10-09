@@ -1,5 +1,6 @@
 package com.example.pong;
 
+import game.Game;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.event.ActionEvent;
@@ -11,40 +12,50 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
+
+import java.util.Stack;
 
 public class Menu {
     private  Group menuRoot;
     private Scene scene;
+    private Game game = new Game();
     public Menu(Stage stage){
 
         menuRoot = new Group();
         scene = new Scene(menuRoot);
         scene.setFill(Color.BLACK);
 
-        TextButton startButton = new TextButton(MainVariables.sizeX/2, MainVariables.sizeY/2 ,"START", 200*MainVariables.ratioXY, 50 / MainVariables.ratioXY,  new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("a");
-            }
-        });
-
         GridPane gridPane = new GridPane();
         gridPane.setPadding(new Insets(10));
         gridPane.setHgap(5);
         gridPane.setVgap(5);
         // keep gridPane at original size
-        gridPane.setMinSize(1500, 500);
-        gridPane.setMaxSize(1500, 500);
+        gridPane.setMinSize(MainVariables.sizeX, MainVariables.sizeY);
+        gridPane.setMaxSize(MainVariables.sizeX, MainVariables.sizeY);
 
         StackPane stackPane = new StackPane(gridPane);
-        stackPane.getChildren().add(startButton.getButton());
 
-        NumberBinding maxScale = Bindings.min(stackPane.widthProperty().divide(1500), stackPane.heightProperty().divide(500));
+        Scene newScene = new Scene(stackPane, MainVariables.sizeX, MainVariables.sizeY);
+        stage.setScene(newScene);
+
+        ImageButton startButton = new ImageButton("/graphics/start.png",MainVariables.sizeX/2, MainVariables.sizeY/2 , 200*MainVariables.ratioXY, 50 / MainVariables.ratioXY,  new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                game.show(newScene);
+            }
+        });
+
+
+        stackPane.getChildren().add(startButton.getButton());
+        stackPane.setBackground(new Background(new BackgroundFill(Color.BLACK ,CornerRadii.EMPTY, Insets.EMPTY)));
+        GridPane.setFillHeight(startButton.getButton(), true);
+        GridPane.setFillWidth(startButton.getButton(), true);
+
+        NumberBinding maxScale = Bindings.min(stackPane.widthProperty().divide(MainVariables.sizeX), stackPane.heightProperty().divide(MainVariables.sizeY));
         gridPane.scaleXProperty().bind(maxScale);
         gridPane.scaleYProperty().bind(maxScale);
-
-        stage.setScene(new Scene(stackPane, 1500, 500));
 
         Canvas canvas=new Canvas(MainVariables.sizeX, MainVariables.sizeY);
         menuRoot.getChildren().add(canvas);
