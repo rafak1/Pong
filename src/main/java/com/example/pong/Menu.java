@@ -20,7 +20,7 @@ import java.util.Stack;
 public class Menu {
     private  Group menuRoot;
     public Scene newScene;
-    private Game game = new Game(this);
+    private Game game = new Game();
     public Menu(Stage stage){
 
 

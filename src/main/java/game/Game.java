@@ -24,7 +24,7 @@ public class Game implements Runnable{
     private Thread gamethread;
 
     private Ball ball;
-    private ObjectAnimator ballAnimator;
+    private ObjectAnimator animator;
     private Platform platform1;
     private Platform platform2;
     private int ballSpeed;
@@ -41,7 +41,7 @@ public class Game implements Runnable{
         ballView.setX(sizeX/2);
         ball = new Ball(sizeX/2, sizeY/2,ballView, ballSpeed);
         root.getChildren().add(ballView);
-        ballAnimator = new ObjectAnimator(ball);
+
 
 
         //platforms
@@ -51,17 +51,21 @@ public class Game implements Runnable{
         ImageView platformView2 = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/graphics/table.png")).toString(),20,150,true,true));
         platformView2.setX((sizeX - sizeX/10));
         platformView2.setY(sizeY/2 - 75);
-        platform1 = new Platform(sizeX/5,sizeY/2, platformView1, 5, menu.newScene);
-        platform2 = new Platform((sizeX - sizeX/5),sizeY/2, platformView2, 5, menu.newScene);
+        platform1 = new Platform((sizeX/10),sizeY/2 - 75, platformView1, 10, true);
+        platform2 = new Platform((sizeX - sizeX/10),sizeY/2 - 75, platformView2, 10, false);
         root.getChildren().add(platformView1);
         root.getChildren().add(platformView2);
+
+        animator = new ObjectAnimator(ball);
+        animator.addPlatform(platform1);
+        animator.addPlatform(platform2);
     }
 
     @Override
     public void run() {
-        Thread ballAnimation = new Thread(ballAnimator);
-        ballAnimation.setDaemon(true);
-        ballAnimation.start();
+        Thread animationThread = new Thread(animator);
+        animationThread.setDaemon(true);
+        animationThread.start();
         boolean reflected= false;
         while(true){
             try {
@@ -82,6 +86,14 @@ public class Game implements Runnable{
                     ball.reflect(2 * (ball.angle - 2 * a));
                     reflected = true;
                 }
+                if(ball.getX() <=platform1.getX() + ballSpeed && ball.getX() >= platform1.getX()){
+                    ball.platformReflect(platform1);
+                    reflected = true;
+                }
+                if(ball.getX() <=platform2.getX() + ballSpeed && ball.getX() >= platform2.getX()){
+                    ball.platformReflect(platform2);
+                    reflected = true;
+                }
             }else{
                 if(ball.getY()>= 0 && ball.getY() <= sizeY-50-ballSpeed){
                     reflected = false;
@@ -90,15 +102,14 @@ public class Game implements Runnable{
 
             //game ended
             if(ball.getX() <= 0){
-                ballAnimation.interrupt();
+                animationThread.interrupt();
                 stop();
             }
             if(ball.getX() >= sizeX){
-                ballAnimation.interrupt();
+                animationThread.interrupt();
                 stop();
             }
         }
-
     }
 
     public void stop(){
@@ -109,6 +120,8 @@ public class Game implements Runnable{
     public void show(Scene scene){
         scene.setRoot(root);
         scene.setFill(Color.BLACK);
+        platform1.setSceneControllers(scene);
+        platform2.setSceneControllers(scene);
         gamethread = new Thread(this);
         gamethread.setDaemon(true);
         gamethread.start();

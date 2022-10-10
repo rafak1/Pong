@@ -1,6 +1,7 @@
 package game.objects;
 
 import com.example.pong.App;
+import com.example.pong.MainVariables;
 import com.example.pong.Menu;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -16,25 +17,40 @@ public class Platform extends GameObject{
 
     boolean active;
     final int speed;
+    boolean isFacingRight;
     public AtomicReference<Double> atomicY;
 
-    public Platform(double x, double y, ImageView imageView,int speed, Scene scene) {
+    /**
+     *  creates a platform
+     * @param x x position at start
+     * @param y y position at start
+     * @param imageView imageView of the platform
+     * @param speed speed of the platform
+     * @param isFacingRight is the "reflective surface" of the platform facing right
+     */
+    public Platform(double x, double y, ImageView imageView,int speed, boolean isFacingRight) {
         super(x, y, imageView);
+        this.isFacingRight = isFacingRight;
         this.speed = speed;
         atomicY =new AtomicReference<Double>(y);
-        active = false;
+    }
+
+    /**
+     * Sets keyboard controls for platform
+     * @param scene scene where EventHandler will be placed
+     */
+    public void setSceneControllers(Scene scene){
         scene.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.UP ) {
-                atomicY.set(atomicY.get() + speed);
+                if(atomicY.get() > 0) atomicY.set(atomicY.get() - speed);
             }
             if(e.getCode() == KeyCode.DOWN){
-                atomicY.set(atomicY.get() - speed);
+                if(atomicY.get() + 150 < MainVariables.sizeY) atomicY.set(atomicY.get() + speed);
             }
         });
     }
 
-    public void setActive(){
-        active = true;
+    public boolean isFacingRight() {
+        return isFacingRight;
     }
-
 }

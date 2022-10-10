@@ -25,6 +25,18 @@ public class Ball extends GameObject{
         angle = (angle + r) % 360;
     }
 
+
+    /**
+     * reflects ball on the platform depending on where it hit
+     * @param platform platform in question
+     */
+    public void platformReflect(Platform platform){
+        double up = platform.getY();
+        double down = up+150;
+        //TODO
+    }
+
+
     /**
      * moves along the angle
      */
