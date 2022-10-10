@@ -33,8 +33,10 @@ public class App extends Application {
         sizeY=600 * MainVariables.ratioY;
         MainVariables.ratioXY = sizeX / sizeY;
         stage.setTitle("Pong");
-        Menu menu=new Menu(stage);
         stage.setResizable(true);
+        stage.setWidth(sizeX);
+        stage.setHeight(sizeY);
+        Menu menu=new Menu(stage);
         stage.show();
         bindWidthAndHeightTogether();
     }

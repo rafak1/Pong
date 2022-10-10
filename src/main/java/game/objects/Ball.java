@@ -1,5 +1,6 @@
 package game.objects;
 
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import static com.example.pong.MainVariables.ratioXY;
@@ -7,41 +8,32 @@ import static com.example.pong.MainVariables.sizeX;
 
 public class Ball extends GameObject{
 
-    private double angle;
-    private ImageView image;
-    private int speed;
+    public double angle;
+    private double speed;
 
-    public Ball(double x, double y, ImageView image, int speed) {
-        super(x, y);
-        angle = 0;
-        this.image = image;
+    public Ball(double x, double y, ImageView image, double speed) {
+        super(x, y, image);
+        angle = 89;
         this.speed = speed;
     }
 
     /**
      * changes angle
-     * @param r angle in question (can be multiplexed by (-1) depending on current angle)
+     * @param r angle in question
      */
     public void reflect(double r){
-        if(angle > 90 && angle <= 270){
-            angle = (angle - r) % 360;
-        }else{
-            angle = (angle + r) % 360;
-        }
-    }
-
-    public ImageView getImageView(){
-        return image;
+        angle = (angle + r) % 360;
     }
 
     /**
      * moves along the angle
      */
     public void moveBall(){
-        double tan = Math.tan(Math.toRadians(angle));
-        double changeX = speed * sizeX/1000;
-        double changeY = changeX * tan;
-        move(changeX, changeY);
+        double sin = Math.sin(Math.toRadians(angle));
+        double cos = Math.cos(Math.toRadians(angle));
+        double c = speed * sizeX/1000;
+        double changeX = c * cos;
+        double changeY = c * sin;
+        move(changeX, -changeY);
     }
-
 }
