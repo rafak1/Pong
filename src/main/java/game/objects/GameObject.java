@@ -3,9 +3,9 @@ package game.objects;
 import javafx.scene.image.ImageView;
 
 public class GameObject {
-    private double x;
-    private double y;
-    private ImageView imageView;
+    double x;
+    double y;
+    ImageView imageView;
 
 
 
@@ -26,6 +26,10 @@ public class GameObject {
 
     public double getX(){
         return x;
+    }
+
+    public void setY(double a){
+        y=a;
     }
 
     public double getY(){

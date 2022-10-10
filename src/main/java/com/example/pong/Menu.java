@@ -19,15 +19,16 @@ import java.util.Stack;
 
 public class Menu {
     private  Group menuRoot;
-    private Scene scene;
-    private Game game = new Game();
+    public Scene newScene;
+    private Game game = new Game(this);
     public Menu(Stage stage){
 
-        menuRoot = new Group();
-        scene = new Scene(menuRoot);
-        scene.setFill(Color.BLACK);
 
         GridPane gridPane = new GridPane();
+        StackPane stackPane = new StackPane(gridPane);
+        newScene = new Scene(stackPane, MainVariables.sizeX, MainVariables.sizeY);
+        menuRoot = new Group();
+
         gridPane.setPadding(new Insets(10));
         gridPane.setHgap(5);
         gridPane.setVgap(5);
@@ -35,9 +36,7 @@ public class Menu {
         gridPane.setMinSize(MainVariables.sizeX, MainVariables.sizeY);
         gridPane.setMaxSize(MainVariables.sizeX, MainVariables.sizeY);
 
-        StackPane stackPane = new StackPane(gridPane);
 
-        Scene newScene = new Scene(stackPane, MainVariables.sizeX, MainVariables.sizeY);
         stage.setScene(newScene);
 
         ImageButton startButton = new ImageButton("/graphics/start.png",MainVariables.sizeX/2, MainVariables.sizeY/2 , 200*MainVariables.ratioXY, 50 / MainVariables.ratioXY,  new EventHandler<ActionEvent>() {

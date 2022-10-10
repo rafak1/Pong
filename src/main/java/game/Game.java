@@ -1,16 +1,15 @@
 package game;
 
+import com.example.pong.Menu;
 import game.objects.Ball;
-import game.objects.BallAnimator;
+import game.objects.ObjectAnimator;
 import game.objects.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 import net.GameClient;
 import net.GameServer;
 
@@ -25,7 +24,7 @@ public class Game implements Runnable{
     private Thread gamethread;
 
     private Ball ball;
-    private BallAnimator ballAnimator;
+    private ObjectAnimator ballAnimator;
     private Platform platform1;
     private Platform platform2;
     private int ballSpeed;
@@ -42,7 +41,7 @@ public class Game implements Runnable{
         ballView.setX(sizeX/2);
         ball = new Ball(sizeX/2, sizeY/2,ballView, ballSpeed);
         root.getChildren().add(ballView);
-        ballAnimator = new BallAnimator(ball);
+        ballAnimator = new ObjectAnimator(ball);
 
 
         //platforms
@@ -52,8 +51,8 @@ public class Game implements Runnable{
         ImageView platformView2 = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/graphics/table.png")).toString(),20,150,true,true));
         platformView2.setX((sizeX - sizeX/10));
         platformView2.setY(sizeY/2 - 75);
-        platform1 = new Platform(sizeX/5,sizeY/2, platformView1);
-        platform2 = new Platform((sizeX - sizeX/5),sizeY/2, platformView2);
+        platform1 = new Platform(sizeX/5,sizeY/2, platformView1, 5, menu.newScene);
+        platform2 = new Platform((sizeX - sizeX/5),sizeY/2, platformView2, 5, menu.newScene);
         root.getChildren().add(platformView1);
         root.getChildren().add(platformView2);
     }
@@ -66,7 +65,7 @@ public class Game implements Runnable{
         boolean reflected= false;
         while(true){
             try {
-                Thread.sleep(10);
+                Thread.sleep(6);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 break;
