@@ -35,7 +35,7 @@ public class Game implements Runnable{
         root.getChildren().add(canvas);
 
         //ball
-        ballSpeed = 10;
+        ballSpeed = 4;
         ImageView ballView = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/graphics/ball.png")).toString(),20,20,true,true));
         ballView.setY(sizeY/2);
         ballView.setX(sizeX/2);
@@ -120,8 +120,7 @@ public class Game implements Runnable{
     public void show(Scene scene){
         scene.setRoot(root);
         scene.setFill(Color.BLACK);
-        platform1.setSceneControllers(scene);
-        platform2.setSceneControllers(scene);
+        Platform.setSceneControllers(scene, platform1, platform2);
         gamethread = new Thread(this);
         gamethread.setDaemon(true);
         gamethread.start();

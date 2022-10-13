@@ -17,7 +17,7 @@ public class Platform extends GameObject{
 
     boolean active;
     final int speed;
-    boolean isFacingRight;
+    final boolean isFacingRight;
     public AtomicReference<Double> atomicY;
 
     /**
@@ -39,16 +39,38 @@ public class Platform extends GameObject{
      * Sets keyboard controls for platform
      * @param scene scene where EventHandler will be placed
      */
-    public void setSceneControllers(Scene scene){
+    public static void setSceneControllers(Scene scene, Platform platform1, Platform platform2){
         scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.UP ) {
-                if(atomicY.get() > 0) atomicY.set(atomicY.get() - speed);
-            }
-            if(e.getCode() == KeyCode.DOWN){
-                if(atomicY.get() + 150 < MainVariables.sizeY) atomicY.set(atomicY.get() + speed);
-            }
+                if (e.getCode() == KeyCode.UP) {
+                    if (platform1.atomicY.get() > 0) platform1.atomicY.set(platform1.atomicY.get() - platform1.speed);
+                }
+                if (e.getCode() == KeyCode.DOWN) {
+                    if (platform1.atomicY.get() + 150 < MainVariables.sizeY) platform1.atomicY.set(platform1.atomicY.get() + platform1.speed);
+                }
+                if (e.getCode() == KeyCode.W) {
+                    if (platform2.atomicY.get() > 0) platform2.atomicY.set(platform2.atomicY.get() - platform2.speed);
+                }
+                if (e.getCode() == KeyCode.S) {
+                    if (platform2.atomicY.get() + 150 < MainVariables.sizeY) platform2.atomicY.set(platform2.atomicY.get() + platform2.speed);
+                }
         });
     }
+
+    public double calculateReflectionAngle(double ballY){
+        double up = y;
+        double down = up+150;
+        double a = 180/(up-down);
+        double b = -90*(down+up)/(up-down);
+        if(isFacingRight){
+            return (a*ballY + b)%360;
+        }else{
+            a*=2;
+            b= b*4+180;
+            return (a*ballY + b)%360;
+        }
+    }
+
+
 
     public boolean isFacingRight() {
         return isFacingRight;

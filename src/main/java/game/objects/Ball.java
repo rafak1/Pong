@@ -13,7 +13,7 @@ public class Ball extends GameObject{
 
     public Ball(double x, double y, ImageView image, double speed) {
         super(x, y, image);
-        angle = 89;
+        angle = -180;
         this.speed = speed;
     }
 
@@ -33,7 +33,9 @@ public class Ball extends GameObject{
     public void platformReflect(Platform platform){
         double up = platform.getY();
         double down = up+150;
-        //TODO
+        if(y <= down && y>=up){
+            angle = platform.calculateReflectionAngle(y);
+        }
     }
 
 
