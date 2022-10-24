@@ -40,6 +40,8 @@ public class Menu {
 
         stage.setScene(newScene);
 
+        VBox buttonsBox = new VBox();
+
         ImageButton startButton = new ImageButton("/graphics/start.png",MainVariables.sizeX/2, MainVariables.sizeY/2 , 200*MainVariables.ratioXY, 50 / MainVariables.ratioXY,  new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -49,8 +51,19 @@ public class Menu {
             }
         });
 
+        ImageButton serverButton = new ImageButton("/graphics/server_start.png",MainVariables.sizeX/2, MainVariables.sizeY*2/3 , 200*MainVariables.ratioXY, 50 / MainVariables.ratioXY,  new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                game.show(newScene);
+            }
+        });
 
-        stackPane.getChildren().add(startButton.getButton());
+        buttonsBox.getChildren().addAll(startButton.getButton(), serverButton.getButton());
+        buttonsBox.setAlignment(Pos.CENTER);
+        buttonsBox.setSpacing(30);
+
+
+        stackPane.getChildren().add(buttonsBox);
         stackPane.setBackground(new Background(new BackgroundFill(Color.BLACK ,CornerRadii.EMPTY, Insets.EMPTY)));
         GridPane.setFillHeight(startButton.getButton(), true);
         GridPane.setFillWidth(startButton.getButton(), true);
