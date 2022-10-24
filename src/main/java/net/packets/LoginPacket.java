@@ -17,6 +17,10 @@ public class LoginPacket extends Packet {
         this.username = username;
     }
 
+    public String getUsername(){
+        return username;
+    }
+
     @Override
     public void sendData(GameClient client) {
         client.sendDataToServer(getData().getBytes());

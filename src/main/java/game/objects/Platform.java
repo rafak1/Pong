@@ -20,6 +20,7 @@ public class Platform extends GameObject{
     final boolean isFacingRight;
     public AtomicReference<Double> atomicY;
 
+
     /**
      *  creates a platform
      * @param x x position at start
@@ -54,23 +55,27 @@ public class Platform extends GameObject{
                     if (platform2.atomicY.get() + 150 < MainVariables.sizeY) platform2.atomicY.set(platform2.atomicY.get() + platform2.speed);
                 }
         });
-    }
+    }//TODO to delete and move this to player
 
     public double calculateReflectionAngle(double ballY){
+        double linearA;
+        double linearB;
         double up = y;
         double down = up+150;
-        double a = 180/(up-down);
-        double b = -90*(down+up)/(up-down);
         if(isFacingRight){
-            return (a*ballY + b)%360;
+            linearA = 180/(up-down);
+            linearB = -90*(down+up)/(up-down);
         }else{
-            a*=2;
-            b= b*4+180;
-            return (a*ballY + b)%360;
+            linearA = 180/(down-up);
+            linearB = 90 - (linearA*up);
         }
+        return (linearA*ballY + linearB)%360;
     }
 
 
+    public int getSpeed() {
+        return speed;
+    }
 
     public boolean isFacingRight() {
         return isFacingRight;

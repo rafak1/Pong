@@ -2,6 +2,8 @@ package net;
 
 import game.Game;
 import game.Player;
+import net.packets.*;
+
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -38,8 +40,37 @@ public class GameServer implements Runnable{
             }
 
             // do something with the data
+            parsePacket(newPacket.getData(), newPacket.getAddress(), newPacket.getPort());
 
         }
+    }
+
+    private void parsePacket(byte[] data, InetAddress address, int port) {
+        Packet.PacketTypes type = Packet.lookupPacket(new String(data).trim().substring(0,2));
+        Packet packet;
+        switch (type){
+            default -> {
+            }
+            case INVALID -> {
+            }
+            case LOGIN -> {
+                packet = new LoginPacket(data);
+                System.out.println(address.getHostAddress()+":" + port + " -> " + ((LoginPacket)packet).getUsername() + " connected");
+                //TODO create a player
+                Player player = new Player(address, port);
+                this.addConnection(player,(LoginPacket) packet);
+            }
+            case DISCONNECT ->{
+
+            }
+        }
+    }
+
+    private void addConnection(Player player, LoginPacket packet) {
+        //test
+        this.connectedPlayers.add(player);
+        packet.sendData(this);//?
+        //TODO add player to the game
     }
 
     public void sendDataToAddress(byte[] data, InetAddress ipAddress, int port){

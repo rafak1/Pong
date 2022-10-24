@@ -51,8 +51,12 @@ public class Game implements Runnable{
         ImageView platformView2 = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/graphics/table.png")).toString(),20,150,true,true));
         platformView2.setX((sizeX - sizeX/10));
         platformView2.setY(sizeY/2 - 75);
+        Player player1 = null;
+        Player player2 = null;
         platform1 = new Platform((sizeX/10),sizeY/2 - 75, platformView1, 10, true);
         platform2 = new Platform((sizeX - sizeX/10),sizeY/2 - 75, platformView2, 10, false);
+       //player1.setPaltform(platform1);
+        //player2.setPaltform(platform2); todo
         root.getChildren().add(platformView1);
         root.getChildren().add(platformView2);
 
@@ -113,7 +117,7 @@ public class Game implements Runnable{
     }
 
     public void stop(){
-
+        //todo
     }
 
 

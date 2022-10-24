@@ -17,6 +17,20 @@ public abstract class Packet {
         }
     }
 
+    public static PacketTypes lookupPacket(String id){
+        try {
+            int packetId = Integer.parseInt(id);
+            for(PacketTypes p : PacketTypes.values()){
+                if(p.getPacketId() == packetId){
+                    return p;
+                }
+            }
+            return  PacketTypes.INVALID;
+        }catch(NumberFormatException a){
+            return PacketTypes.INVALID;
+        }
+    }
+
     public byte packetId;
 
     public Packet(int id){

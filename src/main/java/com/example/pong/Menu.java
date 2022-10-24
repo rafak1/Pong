@@ -14,6 +14,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
+import javax.swing.*;
 
 import java.util.Stack;
 
@@ -42,6 +43,8 @@ public class Menu {
         ImageButton startButton = new ImageButton("/graphics/start.png",MainVariables.sizeX/2, MainVariables.sizeY/2 , 200*MainVariables.ratioXY, 50 / MainVariables.ratioXY,  new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+
+                String playerName = JOptionPane.showInputDialog( "Please enter a username");
                 game.show(newScene);
             }
         });
