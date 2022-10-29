@@ -1,18 +1,24 @@
 package game;
 
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.UnknownHostException;
 
 import com.example.pong.MainVariables;
 import game.objects.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import net.GameServer;
+import net.SocketClass;
 
 public class Player {
     public InetAddress ipAddress;
     public int port;
+    SocketClass socketClass;
     Platform paltform;
 
-    public Player(InetAddress ipAddress, int port){
+    public Player(InetAddress ipAddress, int port, SocketClass socketClass){
+        this.socketClass = socketClass;
         this.ipAddress = ipAddress;
         this.port = port;
     }
@@ -25,24 +31,31 @@ public class Player {
      * sets controllers foor both players
      * @param scene scene where those controls will work
      * @param player1 player with a platform facing right
-     * @param player2 the other player
      */
-    public static void setSceneControllers(Scene scene, Player player1, Player player2){
-        if(!player1.paltform.isFacingRight()){
-            throw new IllegalArgumentException();
-        }
+    public static void setSceneControllers(Scene scene, Player player1){
         scene.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.UP) {
-                if (player1.paltform.atomicY.get() > 0) player1.paltform.atomicY.set(player1.paltform.atomicY.get() - player1.paltform.getSpeed());
-            }
-            if (e.getCode() == KeyCode.DOWN) {
-                if (player1.paltform.atomicY.get() + 150 < MainVariables.sizeY) player1.paltform.atomicY.set(player1.paltform.atomicY.get() + player1.paltform.getSpeed());
-            }
-            if (e.getCode() == KeyCode.W) {
-                if (player2.paltform.atomicY.get() > 0) player2.paltform.atomicY.set(player2.paltform.atomicY.get() - player2.paltform.getSpeed());
-            }
-            if (e.getCode() == KeyCode.S) {
-                if (player2.paltform.atomicY.get() + 150 < MainVariables.sizeY) player2.paltform.atomicY.set(player2.paltform.atomicY.get() + player2.paltform.getSpeed());
+            try {
+                if(player1.ipAddress.equals(InetAddress.getByName("localhost")) && player1.socketClass.getClass() == GameServer.class){
+                    if (e.getCode() == KeyCode.W) {
+                        if (player1.paltform.atomicY.get() > 0)
+                            player1.paltform.atomicY.set(player1.paltform.atomicY.get() - player1.paltform.getSpeed());
+                    }
+                    if (e.getCode() == KeyCode.S) {
+                        if (player1.paltform.atomicY.get() + 150 < MainVariables.sizeY)
+                            player1.paltform.atomicY.set(player1.paltform.atomicY.get() + player1.paltform.getSpeed());
+                    }
+                }else {
+                    if (e.getCode() == KeyCode.UP) {
+                        if (player1.paltform.atomicY.get() > 0)
+                            player1.paltform.atomicY.set(player1.paltform.atomicY.get() - player1.paltform.getSpeed());
+                    }
+                    if (e.getCode() == KeyCode.DOWN) {
+                        if (player1.paltform.atomicY.get() + 150 < MainVariables.sizeY)
+                            player1.paltform.atomicY.set(player1.paltform.atomicY.get() + player1.paltform.getSpeed());
+                    }
+                }
+            } catch (UnknownHostException unknownHostException) {
+                unknownHostException.printStackTrace();
             }
         });
     }

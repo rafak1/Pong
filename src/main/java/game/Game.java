@@ -10,6 +10,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import net.GameClient;
 import net.GameServer;
 
@@ -25,11 +26,17 @@ public class Game implements Runnable{
 
     private Ball ball;
     private ObjectAnimator animator;
-    private Platform platform1;
-    private Platform platform2;
+    private Platform platform;
+    private Platform enemyPlatform;
+    private Player player;
     private int ballSpeed;
+    private Menu menu;
+    private Scene scene;
+    private Stage stage;
 
-    public Game(){
+    public Game(Menu menu, Stage stage){
+        this.stage = stage;
+        this.menu = menu;
         root = new Group();
         Canvas canvas = new Canvas(sizeX, sizeY);
         root.getChildren().add(canvas);
@@ -51,18 +58,16 @@ public class Game implements Runnable{
         ImageView platformView2 = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/graphics/table.png")).toString(),20,150,true,true));
         platformView2.setX((sizeX - sizeX/10));
         platformView2.setY(sizeY/2 - 75);
-        Player player1 = null;
-        Player player2 = null;
-        platform1 = new Platform((sizeX/10),sizeY/2 - 75, platformView1, 10, true);
-        platform2 = new Platform((sizeX - sizeX/10),sizeY/2 - 75, platformView2, 10, false);
+        platform = new Platform((sizeX/10),sizeY/2 - 75, platformView1, 10, true);
+        enemyPlatform = new Platform((sizeX - sizeX/10),sizeY/2 - 75, platformView2, 10, false);
        //player1.setPaltform(platform1);
         //player2.setPaltform(platform2); todo
         root.getChildren().add(platformView1);
         root.getChildren().add(platformView2);
 
         animator = new ObjectAnimator(ball);
-        animator.addPlatform(platform1);
-        animator.addPlatform(platform2);
+        animator.addPlatform(platform);
+        animator.addPlatform(enemyPlatform);
     }
 
     @Override
@@ -90,12 +95,12 @@ public class Game implements Runnable{
                     ball.reflect(2 * (ball.angle - 2 * a));
                     reflected = true;
                 }
-                if(ball.getX() <=platform1.getX() + ballSpeed && ball.getX() >= platform1.getX()){
-                    ball.platformReflect(platform1);
+                if(ball.getX() <= platform.getX() + ballSpeed && ball.getX() >= platform.getX()){
+                    ball.platformReflect(platform);
                     reflected = true;
                 }
-                if(ball.getX() <=platform2.getX() + ballSpeed && ball.getX() >= platform2.getX()){
-                    ball.platformReflect(platform2);
+                if(ball.getX() <= enemyPlatform.getX() + ballSpeed && ball.getX() >= enemyPlatform.getX()){
+                    ball.platformReflect(enemyPlatform);
                     reflected = true;
                 }
             }else{
@@ -117,16 +122,33 @@ public class Game implements Runnable{
     }
 
     public void stop(){
-        //todo
+        if(gamethread.isAlive()) gamethread.interrupt();
+        javafx.application.Platform.runLater(()->  menu = new Menu(stage));
+        scene.setRoot(menu.getMenuRoot());
     }
 
 
     public void show(Scene scene){
+        this.scene = scene;
         scene.setRoot(root);
         scene.setFill(Color.BLACK);
-        Platform.setSceneControllers(scene, platform1, platform2);
         gamethread = new Thread(this);
         gamethread.setDaemon(true);
+        Player.setSceneControllers(scene, player);
         gamethread.start();
+    }
+
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        player.setPaltform(platform);
+        this.player = player;
+    }
+
+    public Platform getEnemyPlatform() {
+        return enemyPlatform;
     }
 }

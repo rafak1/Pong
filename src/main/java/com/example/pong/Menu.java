@@ -15,15 +15,20 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import net.GameClient;
+import net.GameServer;
+import net.packets.LoginPacket;
 
 import java.util.Optional;
 
 public class Menu {
-    private  Group menuRoot;
+    private final Group menuRoot;
     public Scene newScene;
-    private Game game = new Game();
+    private final Game game;
+    private GameServer socketServer;
+    private GameClient socketClient;
     public Menu(Stage stage){
-
+         game = new Game(this,stage);
 
         GridPane gridPane = new GridPane();
         StackPane stackPane = new StackPane(gridPane);
@@ -46,7 +51,22 @@ public class Menu {
             @Override
             public void handle(ActionEvent event) {
                 Pair<String, String> res = optionPane(new Pair<>("Username: ","Username"), new Pair<>("Server ip: ","00:00:00:00"), "Join a Server", "Join a Server");
-                if(res != null ) game.show(newScene);
+                if(res != null ){
+                    socketClient = new GameClient(res.getValue(), game);
+                    Thread clientThread = new Thread(socketClient);
+                    clientThread.setDaemon(true);
+                    Alert alert = waitForConnection("Connecting", "Connecting...");
+                    socketClient.connectionAlert = alert;
+                    clientThread.start(); //TODO
+                    LoginPacket loginPacket = new LoginPacket(res.getKey());
+                    loginPacket.sendData(socketClient);
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.CANCEL && !socketClient.isConnected.get()) {
+                        clientThread.interrupt();
+                    }else{
+                        game.show(newScene);
+                    }
+                }
             }
         });
 
@@ -54,7 +74,22 @@ public class Menu {
             @Override
             public void handle(ActionEvent event) {
                 Pair<String, String> res = optionPane(new Pair<>("Username: ","Username"), new Pair<>("Server ip: ","00:00:00:00"), "Create a Server", "Start Server");
-                if(res != null ) game.show(newScene);
+                if(res != null ) {
+                    socketServer = new GameServer(res.getValue(), game);
+                    //socketClient = new GameClient(res.getValue(), game); ?
+                    Thread serverThread = new Thread(socketServer);
+                    serverThread.setDaemon(true);
+                    Alert alert = waitForConnection("Waiting for the other player", "Waiting...");
+                    socketServer.connectionAlert = alert;
+                    serverThread.start(); //TODO
+                    Optional<ButtonType> result = alert.showAndWait();
+                    if (result.isPresent() && result.get() == ButtonType.CANCEL && !socketServer.isConnected.get()) {
+                        System.out.println("Canceled");
+                        serverThread.interrupt();
+                    }else{
+                        game.show(newScene);
+                    }
+                }
             }
         });
 
@@ -112,4 +147,20 @@ public class Menu {
         return result.orElse(null);
     }
 
+    private static Alert waitForConnection(String title, String context){
+        Alert alert = new Alert(Alert.AlertType.NONE,"", ButtonType.CANCEL);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(context);
+        return alert;
+    }
+
+    /*public static void  killAlert(Alert alert){
+        Button cancelButton = ( Button ) alert.getDialogPane().lookupButton( ButtonType.CANCEL );
+        cancelButton.fire();
+    }TODO delete*/
+
+    public Group getMenuRoot() {
+        return menuRoot;
+    }
 }

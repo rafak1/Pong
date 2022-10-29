@@ -20,7 +20,6 @@ public class ObjectAnimator implements Runnable{
                 break;
             }
             ball.moveBall();
-            System.out.println(ball.angle + " " + ball.getY());
             Platform.runLater(() -> {
                 ball.getImageView().setY(ball.getY());
                 ball.getImageView().setX(ball.getX());

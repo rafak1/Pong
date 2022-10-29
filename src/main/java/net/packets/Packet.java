@@ -6,7 +6,7 @@ import net.GameServer;
 public abstract class Packet {
 
     public static enum PacketTypes{
-        INVALID(-1), LOGIN(10), DISCONNECT(11);
+        INVALID(-1), LOGIN(10), DISCONNECT(11), MOVE(12);
 
         private int packetId;
         private PacketTypes(int id){
@@ -41,7 +41,7 @@ public abstract class Packet {
 
     public abstract void sendData(GameServer server);   //send to all clients connected to the server
 
-    public abstract String getData();
+    public abstract byte[] getData();
 
     public String readData(byte[] data){
         String dataMessage = new String(data).trim();

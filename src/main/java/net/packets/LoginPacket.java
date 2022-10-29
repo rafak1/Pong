@@ -23,16 +23,16 @@ public class LoginPacket extends Packet {
 
     @Override
     public void sendData(GameClient client) {
-        client.sendDataToServer(getData().getBytes());
+        client.sendDataToServer(getData());
     }
 
     @Override
     public void sendData(GameServer server) {
-        server.sendDataToAllClients(getData().getBytes());
+        server.sendDataToAllClients(getData());
     }
 
     @Override
-    public String getData() {   //send data
-        return ("10" + this.username);
+    public byte[] getData() {   //send data
+        return ("10" + this.username).getBytes();
     }
 }

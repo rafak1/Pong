@@ -2,6 +2,8 @@ package net;
 
 import game.Game;
 import game.Player;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import net.packets.*;
 
 
@@ -11,20 +13,29 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class GameServer implements Runnable{
+public class GameServer extends SocketClass implements Runnable {
 
     private DatagramSocket socket;
     private Game game;
-    private List<Player> connectedPlayers = new ArrayList<Player>();
+    private Player player;
+    private Player enemy;
+    public Alert connectionAlert;
+    public AtomicBoolean isConnected;
+    private InetAddress ip;
 
-    public GameServer(String ip, Game game){
+    public GameServer(String ip,  Game game){   //ip ?
         this.game = game;
+        isConnected = new AtomicBoolean(false);
         try {
+            this.ip = InetAddress.getByName(ip);
             socket = new DatagramSocket(1331);
+            player = new Player(this.ip, 1133, this);
         }catch (Exception a){
             a.printStackTrace();
         }
+        game.setPlayer(player);
     }
 
     @Override
@@ -35,6 +46,7 @@ public class GameServer implements Runnable{
 
             try {
                 socket.receive(newPacket);
+                System.out.println("packet received by server");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -57,7 +69,15 @@ public class GameServer implements Runnable{
                 packet = new LoginPacket(data);
                 System.out.println(address.getHostAddress()+":" + port + " -> " + ((LoginPacket)packet).getUsername() + " connected");
                 //TODO create a player
-                Player player = new Player(address, port);
+
+                enemy = new Player(address, port, this);
+                enemy.setPaltform(game.getEnemyPlatform());
+
+                LoginPacket loginPacket = new LoginPacket("server");
+                loginPacket.sendData(this);
+                isConnected.set(true);
+                Platform.runLater( connectionAlert::close);
+
                 this.addConnection(player,(LoginPacket) packet);
             }
             case DISCONNECT ->{
@@ -68,7 +88,7 @@ public class GameServer implements Runnable{
 
     private void addConnection(Player player, LoginPacket packet) {
         //test
-        this.connectedPlayers.add(player);
+        enemy = player;
         packet.sendData(this);//?
         //TODO add player to the game
     }
@@ -83,8 +103,6 @@ public class GameServer implements Runnable{
     }
 
     public void sendDataToAllClients(byte[] data) {
-        for(Player p : connectedPlayers){
-            sendDataToAddress(data, p.ipAddress, p.port);
-        }
+        if(enemy!=null) sendDataToAddress(data, enemy.ipAddress, enemy.port);
     }
 }
