@@ -21,7 +21,6 @@ public abstract class Packet {
     public static PacketTypes lookupPacket(String id){
         try {
             int packetId = Integer.parseInt(id);
-            System.out.println(packetId + " -packetid");
             for(PacketTypes p : PacketTypes.values()){
                 if(p.getPacketId() == packetId){
                     return p;

@@ -39,7 +39,6 @@ public class GameServer extends SocketClass implements Runnable {
 
             try {
                 socket.receive(newPacket);
-                System.out.println("packet received by server");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -57,6 +56,7 @@ public class GameServer extends SocketClass implements Runnable {
             default -> {
             }
             case INVALID -> {
+                System.out.println("INVALID PACKET");
             }
             case LOGIN -> {
                 packet = new LoginPacket(data);
@@ -77,7 +77,6 @@ public class GameServer extends SocketClass implements Runnable {
 
             }
             case MOVE -> {
-                System.out.println("Server moved");
                 packet = new MovePacket(data);
                 moveEnemy((MovePacket) packet);
             }

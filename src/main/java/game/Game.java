@@ -11,8 +11,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import net.GameClient;
-import net.GameServer;
 import net.SocketClass;
 import net.packets.BallSyncPacket;
 
@@ -62,8 +60,6 @@ public class Game implements Runnable{
         platformView2.setY(sizeY/2 - 75);
         platform = new Platform((sizeX/10),sizeY/2 - 75, platformView1, 10, true);
         enemyPlatform = new Platform((sizeX - sizeX/10),sizeY/2 - 75, platformView2, 10, false);
-       //player1.setPaltform(platform1);
-        //player2.setPaltform(platform2); todo
         root.getChildren().add(platformView1);
         root.getChildren().add(platformView2);
 
@@ -88,7 +84,7 @@ public class Game implements Runnable{
             }
             //ball synchronization
             if(isServer) {
-                if (counter == 50) {
+                if (counter == 3) {
                     BallSyncPacket packet = new BallSyncPacket(ball.getX(), ball.getY(), ball.angle);
                     packet.sendData(socketClass);
                     counter = 0;

@@ -42,9 +42,7 @@ public class GameClient extends SocketClass implements Runnable{
             DatagramPacket newPacket = new DatagramPacket(data, data.length);
 
             try {
-                System.out.println("trying to receive a server packet");
                 socket.receive(newPacket);
-                System.out.println("packet received by client");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -81,7 +79,6 @@ public class GameClient extends SocketClass implements Runnable{
                 moveEnemy((MovePacket) packet);
             }
             case BALLSYNC -> {
-                System.out.println("ball is being synced");
                 packet = new BallSyncPacket(data);
                 syncBall((BallSyncPacket) packet, game.getBall());
             }

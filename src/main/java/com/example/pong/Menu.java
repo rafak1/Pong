@@ -19,6 +19,8 @@ import net.GameClient;
 import net.GameServer;
 import net.packets.LoginPacket;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Optional;
 
 public class Menu {
@@ -28,6 +30,10 @@ public class Menu {
     private GameServer socketServer;
     private GameClient socketClient;
     public Menu(Stage stage){
+
+
+
+
          game = new Game(this,stage);
 
         GridPane gridPane = new GridPane();
@@ -61,7 +67,12 @@ public class Menu {
                     socketClient.connectionAlert = alert;
                     clientThread.start(); //TODO
                     LoginPacket loginPacket = new LoginPacket(res.getKey());
-                    loginPacket.sendData(socketClient);
+                    while (!socketClient.isConnected.get()) {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException ignored){}
+                        loginPacket.sendData(socketClient);
+                    }
                     Optional<ButtonType> result = alert.showAndWait();
                     if (result.isPresent() && result.get() == ButtonType.CANCEL && !socketClient.isConnected.get()) {
                         clientThread.interrupt();
@@ -157,11 +168,6 @@ public class Menu {
         alert.setContentText(context);
         return alert;
     }
-
-    /*public static void  killAlert(Alert alert){
-        Button cancelButton = ( Button ) alert.getDialogPane().lookupButton( ButtonType.CANCEL );
-        cancelButton.fire();
-    }TODO delete*/
 
     public Group getMenuRoot() {
         return menuRoot;

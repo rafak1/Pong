@@ -1,5 +1,6 @@
 package net;
 
+import com.example.pong.MainVariables;
 import game.Game;
 import game.Player;
 import game.objects.Ball;
@@ -19,20 +20,19 @@ public class SocketClass {
     Player enemy;
 
     public void moveEnemy(MovePacket packet){
-        enemy.getPlatform().atomicY.set ( packet.y);
-        enemy.getPlatform().setY(packet.y);
+        enemy.getPlatform().atomicY.set ( packet.y * MainVariables.ratioX);
+        enemy.getPlatform().setY(packet.y * MainVariables.ratioY);
     }
 
     public void syncBall(BallSyncPacket packet, Ball ball){
-        ball.setX(packet.x);
-        ball.setY(packet.y);
+        ball.setX(packet.x * MainVariables.ratioX);
+        ball.setY(packet.y * MainVariables.ratioY);
         ball.setAngle(packet.angle);
     }
 
     public void sendPacket(byte[] data, InetAddress ipAdress, DatagramSocket socket, int port){
         DatagramPacket packet = new DatagramPacket(data, data.length, ipAdress, port); //TODO change later
         try {
-            System.out.println("sending packet ... ");
             socket.send(packet);
         } catch (IOException e) {
             e.printStackTrace();
