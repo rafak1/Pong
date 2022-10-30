@@ -36,27 +36,6 @@ public class Platform extends GameObject{
         atomicY =new AtomicReference<Double>(y);
     }
 
-    /**
-     * Sets keyboard controls for platform
-     * @param scene scene where EventHandler will be placed
-     */
-    /*public static void setSceneControllers(Scene scene, Platform platform1, Platform platform2){
-        scene.setOnKeyPressed(e -> {
-                if (e.getCode() == KeyCode.UP) {
-                    if (platform1.atomicY.get() > 0) platform1.atomicY.set(platform1.atomicY.get() - platform1.speed);
-                }
-                if (e.getCode() == KeyCode.DOWN) {
-                    if (platform1.atomicY.get() + 150 < MainVariables.sizeY) platform1.atomicY.set(platform1.atomicY.get() + platform1.speed);
-                }
-                if (e.getCode() == KeyCode.W) {
-                    if (platform2.atomicY.get() > 0) platform2.atomicY.set(platform2.atomicY.get() - platform2.speed);
-                }
-                if (e.getCode() == KeyCode.S) {
-                    if (platform2.atomicY.get() + 150 < MainVariables.sizeY) platform2.atomicY.set(platform2.atomicY.get() + platform2.speed);
-                }
-        });
-    }//TODO to delete and move this to player*/
-
     public double calculateReflectionAngle(double ballY){
         double linearA;
         double linearB;

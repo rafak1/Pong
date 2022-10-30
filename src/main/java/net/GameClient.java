@@ -4,7 +4,9 @@ import game.Game;
 import game.Player;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import net.packets.BallSyncPacket;
 import net.packets.LoginPacket;
+import net.packets.MovePacket;
 import net.packets.Packet;
 
 import java.io.IOException;
@@ -15,11 +17,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameClient extends SocketClass implements Runnable{
 
-    private InetAddress ipAdress;
-    private DatagramSocket socket;
-    private Game game;
+
     private Player player;
-    private  Player enemy;
     public Alert connectionAlert;
     public AtomicBoolean isConnected;
 
@@ -72,22 +71,25 @@ public class GameClient extends SocketClass implements Runnable{
 
 
                 enemy = new Player(address, port, this);
-                enemy.setPaltform(game.getEnemyPlatform());
+                enemy.setPlatform(game.getEnemyPlatform());
             }
             case DISCONNECT ->{
                 //TODO
+            }
+            case MOVE -> {
+                packet = new MovePacket(data);
+                moveEnemy((MovePacket) packet);
+            }
+            case BALLSYNC -> {
+                System.out.println("ball is being synced");
+                packet = new BallSyncPacket(data);
+                syncBall((BallSyncPacket) packet, game.getBall());
             }
         }
     }
 
 
     public void sendDataToServer(byte[] data){
-        DatagramPacket packet = new DatagramPacket(data, data.length, ipAdress, 1331); //TODO change later
-        try {
-            System.out.println("sending packet ... ");
-            socket.send(packet);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        sendPacket(data, ipAdress,socket, 1331);
     }
 }

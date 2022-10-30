@@ -52,7 +52,9 @@ public class Menu {
             public void handle(ActionEvent event) {
                 Pair<String, String> res = optionPane(new Pair<>("Username: ","Username"), new Pair<>("Server ip: ","00:00:00:00"), "Join a Server", "Join a Server");
                 if(res != null ){
+                    game.setIsServer(false);
                     socketClient = new GameClient(res.getValue(), game);
+                    game.setSocketClass(socketClient);
                     Thread clientThread = new Thread(socketClient);
                     clientThread.setDaemon(true);
                     Alert alert = waitForConnection("Connecting", "Connecting...");
@@ -73,10 +75,11 @@ public class Menu {
         ImageButton serverButton = new ImageButton("/graphics/server_start.png",MainVariables.sizeX/2, MainVariables.sizeY*2/3 , 200*MainVariables.ratioXY, 50 / MainVariables.ratioXY,  new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Pair<String, String> res = optionPane(new Pair<>("Username: ","Username"), new Pair<>("Server ip: ","00:00:00:00"), "Create a Server", "Start Server");
+                Pair<String, String> res = optionPane(new Pair<>("Username: ","Username"), new Pair<>("Player ip: ","00:00:00:00"), "Create a Server", "Start Server");
                 if(res != null ) {
+                    game.setIsServer(true);
                     socketServer = new GameServer(res.getValue(), game);
-                    //socketClient = new GameClient(res.getValue(), game); ?
+                    game.setSocketClass(socketServer);
                     Thread serverThread = new Thread(socketServer);
                     serverThread.setDaemon(true);
                     Alert alert = waitForConnection("Waiting for the other player", "Waiting...");

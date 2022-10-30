@@ -13,14 +13,14 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import net.GameClient;
 import net.GameServer;
+import net.SocketClass;
+import net.packets.BallSyncPacket;
 
 import java.util.Objects;
 
 import static com.example.pong.MainVariables.*;
 
 public class Game implements Runnable{
-    private GameClient gameClient;
-    private GameServer gameServer;
     private Group root;
     private Thread gamethread;
 
@@ -33,6 +33,8 @@ public class Game implements Runnable{
     private Menu menu;
     private Scene scene;
     private Stage stage;
+    private boolean isServer;
+    private SocketClass socketClass;
 
     public Game(Menu menu, Stage stage){
         this.stage = stage;
@@ -72,6 +74,7 @@ public class Game implements Runnable{
 
     @Override
     public void run() {
+        int counter = 0;
         Thread animationThread = new Thread(animator);
         animationThread.setDaemon(true);
         animationThread.start();
@@ -82,6 +85,14 @@ public class Game implements Runnable{
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 break;
+            }
+            //ball synchronization
+            if(isServer) {
+                if (counter == 50) {
+                    BallSyncPacket packet = new BallSyncPacket(ball.getX(), ball.getY(), ball.angle);
+                    packet.sendData(socketClass);
+                    counter = 0;
+                } else counter++;
             }
             //refelctions
             if(!reflected) {
@@ -144,11 +155,29 @@ public class Game implements Runnable{
     }
 
     public void setPlayer(Player player) {
-        player.setPaltform(platform);
+        if(isServer) player.setPlatform(enemyPlatform);
+        else player.setPlatform(platform);
         this.player = player;
     }
 
     public Platform getEnemyPlatform() {
-        return enemyPlatform;
+        if(isServer) return platform;
+        else return enemyPlatform;
+    }
+
+    public void setIsServer(boolean server) {
+        isServer = server;
+    }
+
+    public boolean isServer() {
+        return isServer;
+    }
+
+    public void setSocketClass(SocketClass socketClass) {
+        this.socketClass = socketClass;
+    }
+
+    public Ball getBall() {
+        return ball;
     }
 }

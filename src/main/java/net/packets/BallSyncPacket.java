@@ -3,23 +3,24 @@ package net.packets;
 import net.GameClient;
 import net.GameServer;
 
-public class MovePacket extends Packet{
-
-    public String username;
+public class BallSyncPacket extends Packet{
     public double y;
+    public double x;
+    public double angle;
 
-    public MovePacket(byte[] data) {
-        super(12);
+    public BallSyncPacket(byte[] data) {
+        super(13);
         String[] dataArray = readData(data).split(",");
-        this.username = dataArray[0];
+        this.x = Double.parseDouble(dataArray[0]);
         this.y = Double.parseDouble(dataArray[1]);
+        this.angle = Double.parseDouble(dataArray[2]);
     }
 
-
-    public MovePacket(String username, double y){
-        super(12);
-        this.username = username;
+    public BallSyncPacket( double x, double y, double angle){
+        super(13);
+        this.x = x;
         this.y = y;
+        this.angle = angle;
     }
 
     @Override
@@ -34,6 +35,6 @@ public class MovePacket extends Packet{
 
     @Override
     public byte[] getData() {
-        return (12 + this.username + "," + this.y).getBytes();
+        return (13 + "" + this.x + "," + this.y + "," + this.angle).getBytes();
     }
 }

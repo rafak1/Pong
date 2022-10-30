@@ -3,8 +3,8 @@ package game.objects;
 import javafx.scene.image.ImageView;
 
 public class GameObject {
-    double x;
-    double y;
+    volatile double x;
+    volatile double y;
     ImageView imageView;
 
 
@@ -34,6 +34,10 @@ public class GameObject {
 
     public double getY(){
         return y;
+    }
+
+    public void setX(double x) {
+        this.x = x;
     }
 
     public ImageView getImageView() {

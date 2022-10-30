@@ -8,7 +8,7 @@ import static com.example.pong.MainVariables.sizeX;
 
 public class Ball extends GameObject{
 
-    public double angle;
+    public volatile double angle;
     private double speed;
 
     public Ball(double x, double y, ImageView image, double speed) {
@@ -49,5 +49,9 @@ public class Ball extends GameObject{
         double changeX = c * cos;
         double changeY = c * sin;
         move(changeX, -changeY);
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
     }
 }
