@@ -77,14 +77,14 @@ public class Game implements Runnable{
         boolean reflected= false;
         while(true){
             try {
-                Thread.sleep(6);
+                Thread.sleep(4);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 break;
             }
             //ball synchronization
             if(isServer) {
-                if (counter == 3) {
+                if (counter == 4) {
                     BallSyncPacket packet = new BallSyncPacket(ball.getX(), ball.getY(), ball.angle);
                     packet.sendData(socketClass);
                     counter = 0;
@@ -111,7 +111,7 @@ public class Game implements Runnable{
                     reflected = true;
                 }
             }else{
-                if(ball.getY()>= 0 && ball.getY() <= sizeY-50-ballSpeed){
+                if(ball.getY()>= 0 && ball.getY() <= sizeY-ballSpeed){
                     reflected = false;
                 }
             }

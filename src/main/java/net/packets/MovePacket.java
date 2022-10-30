@@ -1,5 +1,6 @@
 package net.packets;
 
+import com.example.pong.MainVariables;
 import net.GameClient;
 import net.GameServer;
 
@@ -12,14 +13,14 @@ public class MovePacket extends Packet{
         super(12);
         String[] dataArray = readData(data).split(",");
         this.username = dataArray[0];
-        this.y = Double.parseDouble(dataArray[1]);
+        this.y = Double.parseDouble(dataArray[1]) * MainVariables.sizeY;
     }
 
 
     public MovePacket(String username, double y){
         super(12);
         this.username = username;
-        this.y = y;
+        this.y = y / MainVariables.sizeY;
     }
 
     @Override
