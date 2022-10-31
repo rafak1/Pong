@@ -3,6 +3,7 @@ package game.objects;
 import com.example.pong.App;
 import com.example.pong.MainVariables;
 import com.example.pong.Menu;
+import game.Player;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
@@ -19,6 +20,7 @@ public class Platform extends GameObject{
     final int speed;
     final boolean isFacingRight;
     public AtomicReference<Double> atomicY;
+    private Player owner;
 
 
     /**
@@ -58,5 +60,13 @@ public class Platform extends GameObject{
 
     public boolean isFacingRight() {
         return isFacingRight;
+    }
+
+    public Player getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Player owner) {
+        this.owner = owner;
     }
 }

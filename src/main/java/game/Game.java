@@ -7,16 +7,24 @@ import game.objects.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import net.SocketClass;
 import net.packets.BallSyncPacket;
+import net.packets.MovePacket;
+import net.packets.PointSyncPacket;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.example.pong.MainVariables.*;
+import static net.SocketClass.confirmationAlert;
 
 public class Game implements Runnable{
     private Group root;
@@ -32,9 +40,15 @@ public class Game implements Runnable{
     private Scene scene;
     private Stage stage;
     private boolean isServer;
+    public AtomicBoolean isRunning;
     private SocketClass socketClass;
+    private Label score;
+    private AtomicInteger score1;
+    private AtomicInteger score2;
+    private Thread animationThread;
 
     public Game(Menu menu, Stage stage){
+        isRunning = new AtomicBoolean(true);
         this.stage = stage;
         this.menu = menu;
         root = new Group();
@@ -63,6 +77,19 @@ public class Game implements Runnable{
         root.getChildren().add(platformView1);
         root.getChildren().add(platformView2);
 
+        //text
+        score = new Label();
+        score1 = new AtomicInteger(0);
+        score2 = new AtomicInteger(0);
+        score.setText(score1.get() + " : " + score2.get());
+        score.setFont(Font.font("Verdana", FontWeight.BOLD, sizeX * 0.037));
+        score.setLayoutX(sizeX * 0.45);
+        score.setLayoutY(sizeY * 0.05);
+        root.getChildren().add(score);
+
+
+
+
         animator = new ObjectAnimator(ball);
         animator.addPlatform(platform);
         animator.addPlatform(enemyPlatform);
@@ -71,7 +98,7 @@ public class Game implements Runnable{
     @Override
     public void run() {
         int counter = 0;
-        Thread animationThread = new Thread(animator);
+        animationThread = new Thread(animator);
         animationThread.setDaemon(true);
         animationThread.start();
         boolean reflected= false;
@@ -117,13 +144,23 @@ public class Game implements Runnable{
             }
 
             //game ended
-            if(ball.getX() <= 0){
-                animationThread.interrupt();
-                stop();
-            }
-            if(ball.getX() >= sizeX){
-                animationThread.interrupt();
-                stop();
+            if(isServer) {
+                if (ball.getX() <= 0) {
+                    changeScore(score1.get(), score2.get() + 1);
+                    reset();
+                    if (score1.get() == 5) {
+                        animationThread.interrupt();
+                        stop();
+                    }
+                }
+                if (ball.getX() >= sizeX) {
+                    changeScore(score1.get() + 1, score2.get());
+                    reset();
+                    if (score2.get() == 5) {
+                        animationThread.interrupt();
+                        stop();
+                    }
+                }
             }
         }
     }
@@ -131,9 +168,32 @@ public class Game implements Runnable{
     public void stop(){
         if(gamethread.isAlive()) gamethread.interrupt();
         javafx.application.Platform.runLater(()->  menu = new Menu(stage));
+        isRunning.set(false);
         scene.setRoot(menu.getMenuRoot());
     }
 
+    public void reset(){
+        ball.setX(sizeX/2);
+        ball.setY(sizeY/2);
+        ball.setAngle(0);
+        platform.setY(sizeY/2 - 75);
+        platform.atomicY.set(platform.getY());
+        enemyPlatform.setY(sizeY/2 - 75);
+        enemyPlatform.atomicY.set(enemyPlatform.getY());
+
+        if(isServer) {
+            System.out.println(score1.get()    + " game " + score2.get());
+            PointSyncPacket packet = new PointSyncPacket(score1.get(), score2.get());
+            packet.sendData(socketClass);
+        }
+
+
+        BallSyncPacket packet = new BallSyncPacket(ball.getX(), ball.getY(), ball.angle);
+        packet.sendData(socketClass);
+
+        MovePacket packet2 = new MovePacket(player.username, player.platform.atomicY.get());
+        packet2.sendData(socketClass);
+    }
 
     public void show(Scene scene){
         this.scene = scene;
@@ -145,6 +205,20 @@ public class Game implements Runnable{
         gamethread.start();
     }
 
+    public void changeScore(int score1, int score2){
+        this.score1.set( score1);
+        this.score2.set( score2);
+        javafx.application.Platform.runLater(()-> this.score.setText(score1 + " : " + score2));
+        if(this.score1.get() == 5) {
+            javafx.application.Platform.runLater(()-> confirmationAlert(platform.getOwner().username + " has won", "Winner").showAndWait() );
+            animationThread.interrupt();
+            stop();
+        }else if(this.score2.get() == 5) {
+            javafx.application.Platform.runLater(()-> confirmationAlert(enemyPlatform.getOwner().username + " has won", "Winner").showAndWait() );
+            animationThread.interrupt();
+            stop();
+        }
+    }
 
     public Player getPlayer() {
         return player;

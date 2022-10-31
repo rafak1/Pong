@@ -18,13 +18,13 @@ public class GameServer extends SocketClass implements Runnable {
     public Alert connectionAlert;
     public AtomicBoolean isConnected;
 
-    public GameServer(String ip,  Game game){   //ip ?
+    public GameServer(String ip,  Game game, String username){   //ip ?
         this.game = game;
         isConnected = new AtomicBoolean(false);
         try {
             ipAdress = InetAddress.getByName(ip);
             socket = new DatagramSocket(1331);
-            player = new Player(this.ipAdress, 1331, this);
+            player = new Player(username, this.ipAdress, 1331, this);
         }catch (Exception a){
             a.printStackTrace();
         }
@@ -33,7 +33,7 @@ public class GameServer extends SocketClass implements Runnable {
 
     @Override
     public void run() {
-        while(true){
+        while(game.isRunning.get()){
             byte[] data = new byte[1024];
             DatagramPacket newPacket = new DatagramPacket(data, data.length);
 
@@ -47,6 +47,7 @@ public class GameServer extends SocketClass implements Runnable {
             parsePacket(newPacket.getData(), newPacket.getAddress(), newPacket.getPort());
 
         }
+        socket.close();
     }
 
     private void parsePacket(byte[] data, InetAddress address, int port) {
@@ -63,7 +64,7 @@ public class GameServer extends SocketClass implements Runnable {
                 System.out.println(address.getHostAddress()+":" + port + " -> " + ((LoginPacket)packet).getUsername() + " connected");
                 //TODO create a player
 
-                enemy = new Player(address, port, this);
+                enemy = new Player(((LoginPacket) packet).getUsername(), address, port, this);
                 enemy.setPlatform(game.getEnemyPlatform());
 
                 LoginPacket loginPacket = new LoginPacket("server");
@@ -74,11 +75,19 @@ public class GameServer extends SocketClass implements Runnable {
                 //this.addConnection(player,(LoginPacket) packet);
             }
             case DISCONNECT ->{
-
+                packet = new DisconnectPacket(data);
+                game.stop();
+                Platform.runLater(()-> confirmationAlert(((DisconnectPacket) packet).getUsername() + " has disconnected", "Player Disconnected").showAndWait() );
+                Thread.currentThread().interrupt();
             }
             case MOVE -> {
                 packet = new MovePacket(data);
                 moveEnemy((MovePacket) packet);
+            }
+            case POINTSSYNC -> {
+                packet = new PointSyncPacket(data);
+                System.out.println(((PointSyncPacket) packet).score1 + " server " + ((PointSyncPacket) packet).score2);
+                game.changeScore(((PointSyncPacket) packet).score1, ((PointSyncPacket) packet).score2);
             }
         }
     }

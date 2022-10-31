@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import net.GameServer;
 import net.SocketClass;
+import net.packets.DisconnectPacket;
 import net.packets.MovePacket;
 
 public class Player {
@@ -18,14 +19,15 @@ public class Player {
     SocketClass socketClass;
     Platform platform;
 
-    public Player(InetAddress ipAddress, int port, SocketClass socketClass){
-        username = "player";
+    public Player(String username, InetAddress ipAddress, int port, SocketClass socketClass){
+        this.username = username;
         this.socketClass = socketClass;
         this.ipAddress = ipAddress;
         this.port = port;
     }
 
     public void setPlatform(Platform platform) {
+        platform.setOwner(this);
         this.platform = platform;
     }
 
@@ -46,6 +48,7 @@ public class Player {
                         if (player1.platform.atomicY.get() + 150 < MainVariables.sizeY)
                             player1.platform.atomicY.set(player1.platform.atomicY.get() + player1.platform.getSpeed());
                     }
+
                 }else {
                     if (e.getCode() == KeyCode.UP) {
                         if (player1.platform.atomicY.get() > 0)
@@ -55,6 +58,11 @@ public class Player {
                         if (player1.platform.atomicY.get() + 150 < MainVariables.sizeY)
                             player1.platform.atomicY.set(player1.platform.atomicY.get() + player1.platform.getSpeed());
                     }
+                }
+                if(e.getCode() == KeyCode.ESCAPE){
+                    DisconnectPacket packet = new DisconnectPacket(player1.username);
+                    packet.sendData(player1.socketClass);
+                    player1.socketClass.getGame().stop();
                 }
                 MovePacket packet = new MovePacket(player1.username, player1.platform.atomicY.get());
                 packet.sendData(player1.socketClass);

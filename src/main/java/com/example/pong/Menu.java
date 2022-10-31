@@ -11,6 +11,8 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -21,7 +23,11 @@ import net.packets.LoginPacket;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Objects;
 import java.util.Optional;
+
+import static com.example.pong.MainVariables.sizeX;
+import static com.example.pong.MainVariables.sizeY;
 
 public class Menu {
     private final Group menuRoot;
@@ -59,7 +65,7 @@ public class Menu {
                 Pair<String, String> res = optionPane(new Pair<>("Username: ","Username"), new Pair<>("Server ip: ","00:00:00:00"), "Join a Server", "Join a Server");
                 if(res != null ){
                     game.setIsServer(false);
-                    socketClient = new GameClient(res.getValue(), game);
+                    socketClient = new GameClient(res.getValue(), game, res.getKey());
                     game.setSocketClass(socketClient);
                     Thread clientThread = new Thread(socketClient);
                     clientThread.setDaemon(true);
@@ -89,7 +95,7 @@ public class Menu {
                 Pair<String, String> res = optionPane(new Pair<>("Username: ","Username"), new Pair<>("Player ip: ","00:00:00:00"), "Create a Server", "Start Server");
                 if(res != null ) {
                     game.setIsServer(true);
-                    socketServer = new GameServer(res.getValue(), game);
+                    socketServer = new GameServer(res.getValue(), game, res.getKey());
                     game.setSocketClass(socketServer);
                     Thread serverThread = new Thread(socketServer);
                     serverThread.setDaemon(true);
@@ -107,7 +113,11 @@ public class Menu {
             }
         });
 
-        buttonsBox.getChildren().addAll(startButton.getButton(), serverButton.getButton());
+        //title
+        ImageView title = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/graphics/title.png")).toString(),300*MainVariables.ratioXY, 100 / MainVariables.ratioXY,true,true));
+
+
+        buttonsBox.getChildren().addAll(title,startButton.getButton(), serverButton.getButton());
         buttonsBox.setAlignment(Pos.CENTER);
         buttonsBox.setSpacing(30);
 

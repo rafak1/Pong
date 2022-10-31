@@ -7,7 +7,7 @@ import net.SocketClass;
 public abstract class Packet {
 
     public static enum PacketTypes{
-        INVALID(-1), LOGIN(10), DISCONNECT(11), MOVE(12), BALLSYNC(13);
+        INVALID(-1), LOGIN(10), DISCONNECT(11), MOVE(12), BALLSYNC(13), POINTSSYNC(14);
 
         private int packetId;
         private PacketTypes(int id){

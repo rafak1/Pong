@@ -4,6 +4,8 @@ import com.example.pong.MainVariables;
 import game.Game;
 import game.Player;
 import game.objects.Ball;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import net.packets.BallSyncPacket;
 import net.packets.MovePacket;
 
@@ -20,13 +22,13 @@ public class SocketClass {
     Player enemy;
 
     public void moveEnemy(MovePacket packet){
-        enemy.getPlatform().atomicY.set ( packet.y * MainVariables.ratioX);
-        enemy.getPlatform().setY(packet.y * MainVariables.ratioY);
+        enemy.getPlatform().atomicY.set ( packet.y );
+        enemy.getPlatform().setY(packet.y);
     }
 
     public void syncBall(BallSyncPacket packet, Ball ball){
-        ball.setX(packet.x * MainVariables.ratioX);
-        ball.setY(packet.y * MainVariables.ratioY);
+        ball.setX(packet.x );
+        ball.setY(packet.y);
         ball.setAngle(packet.angle);
     }
 
@@ -45,5 +47,17 @@ public class SocketClass {
 
     public DatagramSocket getSocket() {
         return socket;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public static Alert confirmationAlert(String text , String title){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"", ButtonType.OK);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(text);
+        return alert;
     }
 }
