@@ -98,6 +98,7 @@ public class Game implements Runnable{
     @Override
     public void run() {
         int counter = 0;
+        int speedCounter=0;
         animationThread = new Thread(animator);
         animationThread.setDaemon(true);
         animationThread.start();
@@ -117,28 +118,32 @@ public class Game implements Runnable{
                     counter = 0;
                 } else counter++;
             }
+            if(speedCounter == 2500){
+                ball.setSpeed(ball.getSpeed() + 0.25);
+                speedCounter=0;
+            }else speedCounter++;
             //refelctions
             if(!reflected) {
-                if (ball.getY() >= -ballSpeed && ball.getY() <= 0) {
+                if (ball.getY() >= -ball.getSpeed() && ball.getY() <= 0) {
                     double a = ball.angle - 90;
                     ball.reflect(2 * (ball.angle - 2 * a));
                     reflected = true;
                 }
-                if (ball.getY() >= sizeY - 50 - ballSpeed && ball.getY() <= sizeY) {
+                if (ball.getY() >= sizeY -50- ball.getSpeed() && ball.getY() <= sizeY) {
                     double a = ball.angle - 90;
                     ball.reflect(2 * (ball.angle - 2 * a));
                     reflected = true;
                 }
-                if(ball.getX() <= platform.getX() + ballSpeed && ball.getX() >= platform.getX()){
+                if(ball.getX() <= platform.getX() + ball.getSpeed() && ball.getX() >= platform.getX()){
                     ball.platformReflect(platform);
                     reflected = true;
                 }
-                if(ball.getX() <= enemyPlatform.getX() + ballSpeed && ball.getX() >= enemyPlatform.getX()){
+                if(ball.getX() <= enemyPlatform.getX() + ball.getSpeed() && ball.getX() >= enemyPlatform.getX()){
                     ball.platformReflect(enemyPlatform);
                     reflected = true;
                 }
             }else{
-                if(ball.getY()>= 0 && ball.getY() <= sizeY-ballSpeed){
+                if(ball.getY()>= ball.getSpeed() && ball.getY() <= sizeY- 50 -ball.getSpeed()){
                     reflected = false;
                 }
             }
@@ -173,6 +178,7 @@ public class Game implements Runnable{
     }
 
     public void reset(){
+        ball.setSpeed(ballSpeed);
         ball.setX(sizeX/2);
         ball.setY(sizeY/2);
         ball.setAngle(0);

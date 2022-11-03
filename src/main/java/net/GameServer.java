@@ -18,11 +18,12 @@ public class GameServer extends SocketClass implements Runnable {
     public Alert connectionAlert;
     public AtomicBoolean isConnected;
 
-    public GameServer(String ip,  Game game, String username){   //ip ?
+    public GameServer( Game game, String username){   //ip ?
         this.game = game;
         isConnected = new AtomicBoolean(false);
         try {
-            ipAdress = InetAddress.getByName(ip);
+            ipAdress = InetAddress.getLocalHost();
+            System.out.println(ipAdress);
             socket = new DatagramSocket(1331);
             player = new Player(username, this.ipAdress, 1331, this);
         }catch (Exception a){

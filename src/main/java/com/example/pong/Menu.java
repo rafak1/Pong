@@ -71,18 +71,25 @@ public class Menu {
                     clientThread.setDaemon(true);
                     Alert alert = waitForConnection("Connecting", "Connecting...");
                     socketClient.connectionAlert = alert;
-                    clientThread.start(); //TODO
-                    LoginPacket loginPacket = new LoginPacket(res.getKey());
-                    while (!socketClient.isConnected.get()) {
-                        try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException ignored){}
-                        loginPacket.sendData(socketClient);
-                    }
+                    clientThread.start();
+                    Thread connectingThread = new Thread(()-> {
+                        LoginPacket loginPacket = new LoginPacket(res.getKey());
+                        while (!socketClient.isConnected.get()) {
+                            try {
+                                Thread.sleep(100);
+                            } catch (InterruptedException ignored) {
+                            }
+                            loginPacket.sendData(socketClient);
+                        }
+                    });
+                    connectingThread.setDaemon(true);
+                    connectingThread.start();
                     Optional<ButtonType> result = alert.showAndWait();
                     if (result.isPresent() && result.get() == ButtonType.CANCEL && !socketClient.isConnected.get()) {
+                        socketClient.closeSocket();
                         clientThread.interrupt();
                     }else{
+                        connectingThread.interrupt();
                         game.show(newScene);
                     }
                 }
@@ -92,19 +99,27 @@ public class Menu {
         ImageButton serverButton = new ImageButton("/graphics/server_start.png",MainVariables.sizeX/2, MainVariables.sizeY*2/3 , 200*MainVariables.ratioXY, 50 / MainVariables.ratioXY,  new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                Pair<String, String> res = optionPane(new Pair<>("Username: ","Username"), new Pair<>("Player ip: ","00:00:00:00"), "Create a Server", "Start Server");
-                if(res != null ) {
+                TextInputDialog input = new TextInputDialog("username");
+                input.setHeaderText("Enter your username");
+                Optional<String> res =  input.showAndWait();
+                if(res.isPresent() ) {
                     game.setIsServer(true);
-                    socketServer = new GameServer(res.getValue(), game, res.getKey());
+                    socketServer = new GameServer( game, res.get());
                     game.setSocketClass(socketServer);
                     Thread serverThread = new Thread(socketServer);
                     serverThread.setDaemon(true);
-                    Alert alert = waitForConnection("Waiting for the other player", "Waiting...");
+                    Alert alert = null;
+                    try {
+                        alert = waitForConnection("Waiting for the other player", "Waiting...    \n Server ip : " + InetAddress.getLocalHost().getHostAddress());
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
                     socketServer.connectionAlert = alert;
-                    serverThread.start(); //TODO
+                    serverThread.start();
                     Optional<ButtonType> result = alert.showAndWait();
                     if (result.isPresent() && result.get() == ButtonType.CANCEL && !socketServer.isConnected.get()) {
                         System.out.println("Canceled");
+                        socketServer.closeSocket();
                         serverThread.interrupt();
                     }else{
                         game.show(newScene);

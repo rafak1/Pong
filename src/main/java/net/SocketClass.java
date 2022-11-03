@@ -60,4 +60,8 @@ public class SocketClass {
         alert.setContentText(text);
         return alert;
     }
+
+    public void closeSocket(){
+        socket.close();
+    }
 }

@@ -51,6 +51,14 @@ public class Ball extends GameObject{
         move(changeX, -changeY);
     }
 
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
     public void setAngle(double angle) {
         this.angle = angle;
     }
