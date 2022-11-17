@@ -60,7 +60,6 @@ public class GameClient extends SocketClass implements Runnable{
             case LOGIN -> {
                 packet = new LoginPacket(data);
                 System.out.println(address.getHostAddress()+":" + port + " -> " + ((LoginPacket)packet).getUsername() + " has joined");
-                //TODO create a player
 
                 isConnected.set(true);
                 Platform.runLater( connectionAlert::close);

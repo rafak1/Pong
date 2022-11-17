@@ -17,10 +17,12 @@ public class GameServer extends SocketClass implements Runnable {
     private Player player;
     public Alert connectionAlert;
     public AtomicBoolean isConnected;
+    private String username;
 
     public GameServer( Game game, String username){   //ip ?
         this.game = game;
         isConnected = new AtomicBoolean(false);
+        this.username = username;
         try {
             ipAdress = InetAddress.getLocalHost();
             System.out.println(ipAdress);
@@ -68,7 +70,7 @@ public class GameServer extends SocketClass implements Runnable {
                 enemy = new Player(((LoginPacket) packet).getUsername(), address, port, this);
                 enemy.setPlatform(game.getEnemyPlatform());
 
-                LoginPacket loginPacket = new LoginPacket("server");
+                LoginPacket loginPacket = new LoginPacket(username);
                 loginPacket.sendData(this);
                 isConnected.set(true);
                 Platform.runLater( connectionAlert::close);

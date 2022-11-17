@@ -50,7 +50,15 @@ public class Platform extends GameObject{
             linearA = 180/(down-up);
             linearB = 90 - (linearA*up);
         }
-        return (linearA*ballY + linearB)%360;
+        double newAngle = (linearA*ballY + linearB)%360;
+        if(isFacingRight) {
+            if (newAngle > 80 && newAngle <= 90) return 80;
+            else if (newAngle >= 270 && newAngle < 280) return 280;
+        }else {
+             if (newAngle >= 90 && newAngle < 100) return 100;
+            else if(newAngle <=270 && newAngle >260) return 260;
+        }
+        return newAngle;
     }
 
 
