@@ -56,7 +56,7 @@ public class Platform extends GameObject{
             else if (newAngle >= 270 && newAngle < 280) return 280;
         }else {
              if (newAngle >= 90 && newAngle < 100) return 100;
-            else if(newAngle <=270 && newAngle >260) return 260;
+            else if(newAngle <280 && newAngle >=270) return 280;
         }
         return newAngle;
     }
