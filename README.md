@@ -10,15 +10,21 @@ implementation of UDP.
 ## Technologies
  - Java
  - JavaFX
- - Gradle
+ - Gradle 7.4
 
 ## Installation
 
 In the main directory run:
 ```
-$ gradle build
+$ ./build.sh
 ```
 Or you can build it using an IDE (like Intellij).
+
+To run program run
+```
+$ ./run.sh
+```
+If return error with ``Unable to open DISPLAY``, try running it on Linux, not on WSL.
 
 ## Game instructions
 
